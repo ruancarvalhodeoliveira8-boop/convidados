@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nosso Convite 🌿</title>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; background: #f9fbf7; font-family: 'Montserrat', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
+        .petal { position: absolute; background: #e8f0e3; border-radius: 150% 0 150% 0; opacity: 0.6; pointer-events: none; z-index: 1; animation: fall 5s linear infinite; }
+        @keyframes fall { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; } 10% { opacity: 0.8; } 100% { transform: translateY(110vh) rotate(360deg); opacity: 0; } }
+        
+        #tela-nome, #tela-inicial, #tela-pergunta { position: fixed; inset: 0; background: #f9fbf7; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; text-align: center; padding: 20px; }
+        #tela-inicial, #tela-pergunta { display: none; }
+
+        .card { width: 85%; max-width: 380px; background: white; border-radius: 15px; border: 2px solid #7a8f4f; box-shadow: 0 15px 35px rgba(0,0,0,0.1); overflow: hidden; z-index: 10; display: none; }
+        .v-box { padding: 10px; background: #000; }
+        video { width: 100%; display: block; border-radius: 5px; }
+        
+        h1 { font-family: 'Great Vibes', cursive; color: #7a8f4f; font-size: 2.8rem; margin: 0; }
+        input { padding: 12px; border-radius: 10px; border: 1px solid #ccc; width: 250px; margin-top: 20px; font-family: 'Montserrat', sans-serif; text-align: center; outline: none; }
+        
+        .btn { padding: 12px 25px; border-radius: 50px; border: none; cursor: pointer; font-weight: 600; margin-top: 15px; transition: 0.3s; font-size: 0.9rem; width: 220px; }
+        .btn-abrir { background: #7a8f4f; color: white; font-family: 'Great Vibes', cursive; font-size: 2rem; width: auto; padding: 15px 40px; }
+        .btn-sim { background: #7a8f4f; color: white; }
+        .btn-nao { background: #fce4e4; color: #cc8888; }
+        .btn-depois { background: #eee; color: #777; border: 1px dashed #ccc; }
+    </style>
+</head>
+<body>
+
+    <audio id="musica" loop><source src="musica1.mp3" type="audio/mpeg"></audio>
+
+    <div id="tela-nome">
+        <h1>Seja bem-vindo(a)</h1>
+        <p style="color:#666">Por favor, digite seu nome:</p>
+        <input type="text" id="nomeInput" placeholder="Nome Completo">
+        <button class="btn btn-sim" onclick="salvarNome()">Continuar</button>
+    </div>
+
+    <div id="tela-inicial">
+        <h1 id="boasVindas">Olá!</h1>
+        <p style="color:#555">Preparamos algo especial para você...</p>
+        <button class="btn btn-abrir" onclick="iniciar()">Abrir Convite 🌿</button>
+    </div>
+
+    <div id="tela-pergunta">
+        <h1 style="font-size: 2.2rem; color: #333; margin-bottom: 10px;">Podemos contar com você?</h1>
+        <button class="btn btn-sim" onclick="enviarResposta('SIM')">SIM, COM CERTEZA! 🥂</button>
+        <button class="btn btn-nao" onclick="enviarResposta('NAO')">INFELIZMENTE NÃO 💔</button>
+        <button class="btn btn-depois" onclick="enviarResposta('CONFIRMAR DEPOIS')">CONFIRMAR DEPOIS ⏳</button>
+    </div>
+
+    <div class="card" id="card-principal">
+        <div class="v-box">
+            <video id="video" playsinline muted><source src="video1.mp4" type="video/mp4"></video>
+        </div>
+        <div class="content" style="padding: 20px; text-align: center; border-top: 2px solid #7a8f4f;">
+            <h1 id="tituloCard">Esperamos você!</h1>
+            <p style="color:#888; font-size:0.7rem; letter-spacing:2px;">NOSSO GRANDE DIA</p>
+        </div>
+    </div>
+
+    <script>
+        const v = document.getElementById("video");
+        const m = document.getElementById("musica");
+        const FORMSPREE_URL = "https://formspree.io/f/mykygebn";
+        let nomeConvidado = "";
+
+        function salvarNome() {
+            nomeConvidado = document.getElementById("nomeInput").value;
+            if (nomeConvidado.trim() === "") {
+                alert("Por favor, digite seu nome para continuar.");
+            } else {
+                document.getElementById("tela-nome").style.display = "none";
+                document.getElementById("tela-inicial").style.display = "flex";
+                document.getElementById("boasVindas").innerText = "Olá, " + nomeConvidado + "!";
+            }
+        }
+
+        function iniciar() {
+            document.getElementById("tela-inicial").style.display = "none";
+            document.getElementById("card-principal").style.display = "block";
+            m.play().catch(() => {});
+            v.play();
+        }
+
+        v.addEventListener('timeupdate', function() {
+            if (v.currentTime >= 18.9) {
+                v.pause();
+                document.getElementById("card-principal").style.display = "none";
+                document.getElementById("tela-pergunta").style.display = "flex";
+            }
+        });
+
+        function enviarResposta(opcao) {
+            // Envia para o seu e-mail
+            fetch(FORMSPREE_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    Convidado: nomeConvidado, 
+                    Resposta: opcao, 
+                    Data: new Date().toLocaleString() 
+                })
+            });
+
+            document.getElementById("tela-pergunta").style.display = "none";
+            document.getElementById("card-principal").style.display = "block";
+            
+            if(opcao === 'SIM') {
+                document.getElementById("tituloCard").innerText = "Até breve! ❤️";
+                v.play();
+            } else {
+                document.getElementById("tituloCard").innerText = "Obrigado por avisar!";
+                alert("Sua resposta foi enviada com sucesso! ❤️");
+            }
+        }
+
+        // Pétalas
+        for (let i = 0; i < 20; i++) {
+            const p = document.createElement('div');
+            p.className = 'petal';
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.animationDelay = Math.random() * 5 + 's';
+            p.style.width = p.style.height = (Math.random() * 15 + 10) + 'px';
+            document.body.appendChild(p);
+        }
+    </script>
+</body>
+</html>

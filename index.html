@@ -10,52 +10,56 @@
         .petal { position: absolute; background: #e8f0e3; border-radius: 150% 0 150% 0; opacity: 0.6; pointer-events: none; z-index: 1; animation: fall 5s linear infinite; }
         @keyframes fall { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; } 10% { opacity: 0.8; } 100% { transform: translateY(110vh) rotate(360deg); opacity: 0; } }
         
-        #tela-nome, #tela-inicial, #tela-pergunta { position: fixed; inset: 0; background: #f9fbf7; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; text-align: center; padding: 20px; }
-        #tela-inicial, #tela-pergunta { display: none; }
+        #tela-inicial, #tela-pergunta, #tela-triste { position: fixed; inset: 0; background: #f9fbf7; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; text-align: center; padding: 20px; }
+        #tela-pergunta, #tela-triste { display: none; }
 
         .card { width: 85%; max-width: 380px; background: white; border-radius: 15px; border: 2px solid #7a8f4f; box-shadow: 0 15px 35px rgba(0,0,0,0.1); overflow: hidden; z-index: 10; display: none; }
         .v-box { padding: 10px; background: #000; }
         video { width: 100%; display: block; border-radius: 5px; }
         
         h1 { font-family: 'Great Vibes', cursive; color: #7a8f4f; font-size: 2.8rem; margin: 0; }
-        input { padding: 12px; border-radius: 10px; border: 1px solid #ccc; width: 250px; margin-top: 20px; font-family: 'Montserrat', sans-serif; text-align: center; outline: none; }
+        input { padding: 12px; border-radius: 10px; border: 2px solid #ccc; width: 250px; margin-bottom: 15px; font-family: 'Montserrat', sans-serif; text-align: center; outline: none; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         
-        .btn { padding: 12px 25px; border-radius: 50px; border: none; cursor: pointer; font-weight: 600; margin-top: 15px; transition: 0.3s; font-size: 0.9rem; width: 220px; }
+        .btn { padding: 12px 25px; border-radius: 50px; border: none; cursor: pointer; font-weight: 600; margin-top: 10px; transition: 0.3s; font-size: 0.9rem; width: 220px; }
         .btn-abrir { background: #7a8f4f; color: white; font-family: 'Great Vibes', cursive; font-size: 2rem; width: auto; padding: 15px 40px; }
         .btn-sim { background: #7a8f4f; color: white; }
         .btn-nao { background: #fce4e4; color: #cc8888; }
         .btn-depois { background: #eee; color: #777; border: 1px dashed #ccc; }
+        
+        .msg-triste { color: #888; font-size: 1.2rem; margin-top: 10px; padding: 0 20px; }
     </style>
 </head>
 <body>
 
     <audio id="musica" loop><source src="musica1.mp3" type="audio/mpeg"></audio>
 
-    <div id="tela-nome">
-        <h1>Seja bem-vindo(a)</h1>
-        <p style="color:#666">Por favor, digite seu nome:</p>
-        <input type="text" id="nomeInput" placeholder="Nome Completo">
-        <button class="btn btn-sim" onclick="salvarNome()">Continuar</button>
-    </div>
-
     <div id="tela-inicial">
-        <h1 id="boasVindas">Olá!</h1>
-        <p style="color:#555">Preparamos algo especial para você...</p>
+        <h1>Preparamos algo especial...</h1>
+        <p style="color:#555">Assista ao nosso convite</p>
         <button class="btn btn-abrir" onclick="iniciar()">Abrir Convite 🌿</button>
     </div>
 
     <div id="tela-pergunta">
         <h1 style="font-size: 2.2rem; color: #333; margin-bottom: 10px;">Podemos contar com você?</h1>
+        <p style="color:#888; font-size:0.8rem; margin-bottom: 15px;">Digite seu nome para confirmar:</p>
+        
+        <input type="text" id="nomeInput" placeholder="Seu nome aqui">
+        
         <button class="btn btn-sim" onclick="enviarResposta('SIM')">SIM, COM CERTEZA! 🥂</button>
-        <button class="btn btn-nao" onclick="enviarResposta('NAO')">INFELIZMENTE NÃO 💔</button>
         <button class="btn btn-depois" onclick="enviarResposta('CONFIRMAR DEPOIS')">CONFIRMAR DEPOIS ⏳</button>
+        <button class="btn btn-nao" onclick="enviarResposta('NAO')">INFELIZMENTE NÃO 💔</button>
+    </div>
+
+    <div id="tela-triste">
+        <h1>Poxa, que pena...</h1>
+        <p class="msg-triste">Sentiremos muito a sua falta no nosso grande dia! ❤️</p>
     </div>
 
     <div class="card" id="card-principal">
         <div class="v-box">
             <video id="video" playsinline muted><source src="video1.mp4" type="video/mp4"></video>
         </div>
-        <div class="content" style="padding: 20px; text-align: center; border-top: 2px solid #7a8f4f;">
+        <div class="content" style="padding: 20px; text-align: center; border-top: 2px solid #7a8f4f; background: white;">
             <h1 id="tituloCard">Esperamos você!</h1>
             <p style="color:#888; font-size:0.7rem; letter-spacing:2px;">NOSSO GRANDE DIA</p>
         </div>
@@ -65,18 +69,6 @@
         const v = document.getElementById("video");
         const m = document.getElementById("musica");
         const FORMSPREE_URL = "https://formspree.io/f/mykygebn";
-        let nomeConvidado = "";
-
-        function salvarNome() {
-            nomeConvidado = document.getElementById("nomeInput").value;
-            if (nomeConvidado.trim() === "") {
-                alert("Por favor, digite seu nome para continuar.");
-            } else {
-                document.getElementById("tela-nome").style.display = "none";
-                document.getElementById("tela-inicial").style.display = "flex";
-                document.getElementById("boasVindas").innerText = "Olá, " + nomeConvidado + "!";
-            }
-        }
 
         function iniciar() {
             document.getElementById("tela-inicial").style.display = "none";
@@ -85,35 +77,39 @@
             v.play();
         }
 
-        v.addEventListener('timeupdate', function() {
+        function monitorarTempo() {
             if (v.currentTime >= 18.9) {
                 v.pause();
+                v.removeEventListener('timeupdate', monitorarTempo);
                 document.getElementById("card-principal").style.display = "none";
                 document.getElementById("tela-pergunta").style.display = "flex";
             }
-        });
+        }
+        v.addEventListener('timeupdate', monitorarTempo);
 
         function enviarResposta(opcao) {
-            // Envia para o seu e-mail
+            const nome = document.getElementById("nomeInput").value;
+
+            if (nome.trim() === "") {
+                alert("Por favor, digite seu nome para enviar a resposta.");
+                return;
+            }
+
+            // Envia notificação
             fetch(FORMSPREE_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    Convidado: nomeConvidado, 
-                    Resposta: opcao, 
-                    Data: new Date().toLocaleString() 
-                })
+                body: JSON.stringify({ Nome: nome, Resposta: opcao })
             });
 
             document.getElementById("tela-pergunta").style.display = "none";
-            document.getElementById("card-principal").style.display = "block";
-            
-            if(opcao === 'SIM') {
-                document.getElementById("tituloCard").innerText = "Até breve! ❤️";
+
+            if (opcao === 'SIM' || opcao === 'CONFIRMAR DEPOIS') {
+                document.getElementById("card-principal").style.display = "block";
+                document.getElementById("tituloCard").innerText = (opcao === 'SIM') ? "Até breve! ❤️" : "Aguardamos você! ⏳";
                 v.play();
             } else {
-                document.getElementById("tituloCard").innerText = "Obrigado por avisar!";
-                alert("Sua resposta foi enviada com sucesso! ❤️");
+                document.getElementById("tela-triste").style.display = "flex";
             }
         }
 
